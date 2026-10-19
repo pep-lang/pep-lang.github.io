@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install · Pepper</title>
+<meta name="description" content="Install the Pepper toolchain on Linux, macOS or Windows.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+<a class="wordmark" href="/">Pepper</a>
+<nav aria-label="Site"><a href="/">Home</a> <a href="/install.html" aria-current="page">Install</a> <a href="https://docs.pepper-lang.dev/0.10.0/tutorial/tour.html">Tour</a> <a href="https://docs.pepper-lang.dev/">Docs</a> <a href="/blog/">Blog</a> <a href="/community.html">Community</a> <a href="https://github.com/pep-lang/pepper">GitHub</a></nav>
+</header>
+<main>
+<h1>Install Pepper</h1>
+<p>Each release publishes the toolchain prebuilt for Linux, macOS and Windows, with an install script that downloads the right one. You need no LLVM install to use it.</p>
+<h2>Linux and macOS</h2>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/pep-lang/pepper/main/scripts/install.sh | sh</code></pre>
+<h2>Windows (PowerShell)</h2>
+<pre><code>irm https://raw.githubusercontent.com/pep-lang/pepper/main/scripts/install.ps1 | iex</code></pre>
+<p>The script puts the toolchain in <code>~/.pepper</code> (<code>%LOCALAPPDATA%\pepper</code> on Windows), adds it to your <code>PATH</code>, and builds and runs a small program to check the install. The book's <a href="https://docs.pepper-lang.dev/0.10.0/tools/install.html">Installing Pepper</a> chapter covers every option and what the script changes.</p>
+<h2>Editor support</h2>
+<p>The <a href="https://github.com/pep-lang/vscode-pepper">VS Code extension</a> adds highlighting and a language server: errors as you type, hover, completion, go to definition and an outline. Download <code>pepper-language.vsix</code> from its <a href="https://github.com/pep-lang/vscode-pepper/releases">releases</a> and run <strong>Extensions: Install from VSIX...</strong>.</p>
+<h2>Next</h2>
+<p><a href="https://docs.pepper-lang.dev/0.10.0/tutorial/getting-started.html">Getting started</a> writes and runs a first program; <a href="https://docs.pepper-lang.dev/0.10.0/tutorial/tour.html">the tour</a> builds a small one step by step.</p>
+</main>
+<footer>
+<p>Pepper is open source under the Apache-2.0 license. Source, issues and discussions are on <a href="https://github.com/pep-lang/pepper">GitHub</a>.</p>
+</footer>
+</body>
+</html>
