@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Packages · Pepper</title>
+<meta name="description" content="The packages in the Pepper package index.">
+<link rel="stylesheet" href="/style.css">
+<style>
+#filter { width: 100%; font: inherit; padding: 0.45rem 0.7rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.packages { list-style: none; padding: 0; }
+.packages li { padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.packages .name { font-weight: 700; }
+.packages p { margin: 0.2rem 0; }
+</style>
+</head>
+<body>
+<header>
+<a class="wordmark" href="/">Pepper</a>
+<nav aria-label="Site"><a href="/">Home</a> <a href="/install.html">Install</a> <a href="https://docs.pepper-lang.dev/0.10.0/tutorial/tour.html">Tour</a> <a href="https://docs.pepper-lang.dev/">Docs</a> <a href="/packages.html" aria-current="page">Packages</a> <a href="/blog/">Blog</a> <a href="/community.html">Community</a> <a href="https://github.com/pep-lang/pepper">GitHub</a></nav>
+</header>
+<main>
+<h1>Packages</h1>
+<p>Every package in the <a href="https://github.com/pep-lang/index">package index</a>, read from it as this page loads. Add one to a project by its name with <code>pepper package add &lt;name&gt;</code>; <code>pepper package search</code> and <code>pepper package info</code> read the same index. To list a package, open a pull request on the index.</p>
+<label for="filter">Filter</label>
+<input id="filter" type="search" placeholder="Words in a name, description or keyword" autocomplete="off">
+<p id="status" class="meta" role="status">Loading the index…</p>
+<ul id="packages" class="packages"></ul>
+</main>
+<footer>
+<p>Pepper is open source under the Apache-2.0 license. Source, issues and discussions are on <a href="https://github.com/pep-lang/pepper">GitHub</a>.</p>
+</footer>
+<script>
+// Each packages/<name>.toml holds `source`, `description` and `keywords`
+// as plain strings, which these two patterns read.
+function stringOf(text, key) {
+  var m = text.match(new RegExp('^' + key + '\\s*=\\s*"((?:[^"\\\\]|\\\\.)*)"', 'm'));
+  return m ? JSON.parse('"' + m[1] + '"') : '';
+}
+function keywordsOf(text) {
+  var m = text.match(/^keywords\s*=\s*\[(.*)\]/m);
+  return m ? (m[1].match(/"(?:[^"\\]|\\.)*"/g) || []).map(JSON.parse) : [];
+}
+var hosts = { github: 'https://github.com/', gitlab: 'https://gitlab.com/', codeberg: 'https://codeberg.org/' };
+var list = document.getElementById('packages');
+var status = document.getElementById('status');
+var filter = document.getElementById('filter');
+var packages = [];
+function show() {
+  var words = filter.value.toLowerCase().split(/\s+/).filter(Boolean);
+  list.textContent = '';
+  var shown = 0;
+  packages.forEach(function (p) {
+    var text = (p.name + ' ' + p.description + ' ' + p.keywords.join(' ')).toLowerCase();
+    if (!words.every(function (w) { return text.indexOf(w) >= 0; })) return;
+    shown++;
+    var item = document.createElement('li');
+    var name = document.createElement('a');
+    name.className = 'name';
+    name.textContent = p.name;
+    var split = p.source.split(':');
+    name.href = (hosts[split[0]] || hosts.github) + split.slice(1).join(':');
+    var description = document.createElement('p');
+    description.textContent = p.description;
+    var add = document.createElement('p');
+    add.className = 'meta';
+    var code = document.createElement('code');
+    code.textContent = 'pepper package add ' + p.name;
+    add.appendChild(code);
+    if (p.keywords.length) add.appendChild(document.createTextNode(' · ' + p.keywords.join(', ')));
+    item.append(name, description, add);
+    list.appendChild(item);
+  });
+  status.textContent = shown + ' of ' + packages.length + ' packages';
+}
+fetch('https://api.github.com/repos/pep-lang/index/contents/packages')
+  .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(function (files) {
+    return Promise.all(files.filter(function (f) { return /\.toml$/.test(f.name); }).map(function (f) {
+      return fetch(f.download_url).then(function (r) { return r.text(); }).then(function (text) {
+        return { name: f.name.slice(0, -5), source: stringOf(text, 'source'), description: stringOf(text, 'description'), keywords: keywordsOf(text) };
+      });
+    }));
+  })
+  .then(function (found) {
+    packages = found.sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+    filter.addEventListener('input', show);
+    show();
+  })
+  .catch(function () {
+    status.textContent = 'The index could not be read here; see it on GitHub: github.com/pep-lang/index.';
+  });
+</script>
+</body>
+</html>
