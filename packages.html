@@ -42,6 +42,7 @@ function keywordsOf(text) {
   return m ? (m[1].match(/"(?:[^"\\]|\\.)*"/g) || []).map(JSON.parse) : [];
 }
 var hosts = { github: 'https://github.com/', gitlab: 'https://gitlab.com/', codeberg: 'https://codeberg.org/' };
+var hostDomains = { github: 'github.com', gitlab: 'gitlab.com', codeberg: 'codeberg.org' };
 var list = document.getElementById('packages');
 var status = document.getElementById('status');
 var filter = document.getElementById('filter');
@@ -67,6 +68,11 @@ function show() {
     var code = document.createElement('code');
     code.textContent = 'pepper package add ' + p.name;
     add.appendChild(code);
+    // Its reference, on the site the index's docs workflow builds, under its source.
+    var docs = document.createElement('a');
+    docs.textContent = 'docs';
+    docs.href = 'https://pepper-lang.dev/index/' + (hostDomains[split[0]] || hostDomains.github) + '/' + split.slice(1).join(':') + '/';
+    add.append(' · ', docs);
     if (p.keywords.length) add.appendChild(document.createTextNode(' · ' + p.keywords.join(', ')));
     item.append(name, description, add);
     list.appendChild(item);
